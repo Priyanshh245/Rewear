@@ -1,140 +1,141 @@
 # REWEAR
 
-**Make more use of the clothes you already own.**
+**A wardrobe app built with Python, Java and MCP.**
 
-REWEAR is my personal project combining Python with my interest in fashion and modelling. The idea is simple: keep your clothes in one place, try different outfit combinations, and see how a potential purchase fits into your wardrobe before buying it.
+REWEAR is my personal project combining programming with my interest in fashion and modelling. It helps users organise their clothes, put outfits together, and check how a potential purchase works with what they already own.
 
-The interface uses dark burgundy, warm neutrals and a few brass accents. The matching system uses tags you choose, so you can see why a combination was suggested.
+The website uses HTML and CSS forms. Python renders the pages and handles the MCP server. Java calculates the matches. There is no JavaScript in this version.
 
 **Project owner:** Priyansh Panwar
 
-## What it does
+## What you can do
 
-- Add clothes with an optional photo, colour, category, fit, pattern, style and season tags.
-- Build outfits by selecting pieces or dragging them onto the canvas.
-- Find combinations using available clothes with shared style and season tags.
-- Check a potential purchase against your wardrobe and flag items with the same tags.
-- Estimate cost per wear using a price and expected number of wears you enter.
-- Save outfits, log actual wears and export or restore a wardrobe backup.
-- Expose the matching functions through four MCP tools.
+- Add clothes with a photo and tags for category, colour, fit, pattern, style and season.
+- Choose pieces in the outfit studio, check their tags and save a combination.
+- Find outfits containing an optional outer layer.
+- Test a purchase against your wardrobe and see similar owned pieces.
+- Calculate estimated cost per wear from your own price and wear estimate.
+- Save outfits, keep a wear journal and export or restore a backup.
+- Use four read-only MCP tools backed by the Java engine.
 
-## Run it locally
+## The stack
 
-You need Python 3.10 or newer. After downloading or cloning the repository, open Terminal inside the project folder:
+| Part | What it handles |
+| --- | --- |
+| Python | Web routes, page rendering, local storage and MCP calls. |
+| Java | Wardrobe search, outfit checking, outfit generation and purchase comparison. |
+| HTML/CSS | The burgundy browser interface and form controls. |
+| MCP | Tool discovery and structured calls to the matching functions. |
+| JSON | The saved wardrobe and messages between Python and Java. |
+
+Python uses Starlette, Uvicorn, Jinja2 and the official Python MCP SDK. Java uses Gson for JSON. The tested Gson JAR and its license are included in `lib/`.
+
+## Run it on a Mac
+
+You need **Python 3.10+** and a **Java JDK 17+**. Python 3.13 and a JDK 21 installation are suitable choices.
+
+Open Terminal in the extracted `rewear-python-java` folder. Check Java first:
 
 ```sh
-python3 -m venv .venv
+java -version
+javac -version
+```
+
+If Java is missing or older than 17, see `docs/SETUP_AND_GITHUB.md` for the official installer instructions.
+
+Then run:
+
+```sh
+python3.13 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r python/requirements.txt
 python python/server.py
 ```
 
-Then open **http://127.0.0.1:8000**. Keep Terminal open while using the app. Stop it with **Control+C**.
+If you use another supported Python version, replace `python3.13` with that interpreter's command. The server compiles the Java source at startup when needed.
 
-Next time, you only need:
+Open **http://127.0.0.1:8050**. Keep Terminal running. Press Control+C to stop it.
+
+On another day, from the same folder:
 
 ```sh
 source .venv/bin/activate
 python python/server.py
 ```
 
-On Windows, use `py -m venv .venv` and `.venv\Scripts\activate` instead of the first two Mac commands. The remaining commands are the same.
+The port is 8050 so the earlier version on port 8000 can remain separate while you switch over.
 
-To try it quickly, click **Explore sample wardrobe**. The sample clothes are demonstration records that you can replace with your own.
+## Try the app
 
-## Tech stack
+1. In My wardrobe, click Explore sample wardrobe, or add your own clothes.
+2. In Outfit studio, choose a top, bottoms and shoes. Click Check combination to preview the pieces and see the matching notes.
+3. Name the outfit and click Save combination.
+4. In Before you buy, enter a potential item and click Test it with my wardrobe.
+5. In Saved & worn, log an actual wear or undo the last entry.
 
-| Part | Technology |
-| --- | --- |
-| Local matching logic | Python |
-| Local MCP server | Official Python MCP SDK, pinned to the tested v1 API |
-| Local web server | Starlette and Uvicorn |
-| Frontend | HTML, CSS and JavaScript |
-| Browser storage | IndexedDB |
-| Hosted version | JavaScript Worker using the same matching rules |
-| Checks | Python unittest and Node's test runner |
+The website uses ordinary forms, so a button press may refresh the page. Outfits use dropdown selections rather than drag-and-drop.
 
-The local app runs the rules in Python. The hosted version uses JavaScript because the hosting runtime runs Workers. Tests compare the two implementations so their results stay consistent. There is no AI model or external shopping API in this version.
+## How the rules work
 
-## How matching works
+A complete outfit has one top, one bottom and shoes. It can include an outer layer. The pieces must be available and share at least one style and season tag. The first rule set allows one distinct accent colour and one patterned piece. Black, white, grey, beige, brown, navy and blue count as neutrals.
 
-A complete outfit has a top, bottoms and shoes. You can add an outer layer. All selected pieces must be available and share a style and season tag.
+A same-tag substitute matches category, colour, fit, pattern, style and season tags. If an available owned substitute exists, the candidate adds zero new tag combinations. Real fabrics or cuts may still look different. Counts refer to item combinations, so similar-looking outfits can be counted separately.
 
-The first version keeps colour and pattern matching simple: one accent colour and one patterned piece at most. Black, white, grey, beige, brown, navy and blue count as neutrals. These are editable rules, and your own taste has the final say.
-
-When checking a purchase, the app looks for an available owned piece with the same category, colour, fit, pattern, style tags and season tags. If it finds one, the candidate adds zero new **tag combinations**. Two garments can have the same tags and still look different in real life; photos are displayed rather than analysed. Counts refer to combinations of item records, so visually similar outfits can appear more than once.
-
-Cost per wear is simply `price / estimated wears`, shown in CAD.
+Photos are displayed rather than analysed. You choose the tags. Cost per wear is `price / estimated wears`, in CAD.
 
 ## MCP tools
 
-Local endpoint: **http://127.0.0.1:8000/mcp/**
+Endpoint: **http://127.0.0.1:8050/mcp/**
 
-| Tool | What it does |
+| Tool | Result |
 | --- | --- |
-| `search_wardrobe` | Search supplied clothes by name, colour or style. |
-| `build_outfits` | Find complete combinations for selected filters. |
-| `check_outfit` | Explain why a selected outfit passes or fails the rules. |
-| `compare_purchase` | Find candidate-based outfits, similar owned pieces and estimated cost per wear. |
+| `search_wardrobe` | Supplied pieces matching a search. |
+| `build_outfits` | Compatible outfits and missing core categories. |
+| `check_outfit` | Matching reasons or conflicts. |
+| `compare_purchase` | Candidate outfits, same-tag substitutes and estimated cost per wear. |
 
-The frontend calls these tools. Each tool receives garment metadata supplied by its caller. A separate MCP client does not automatically have access to the wardrobe saved in your browser. Connecting the endpoint to an MCP host is a separate setup step.
+The browser submits HTML forms to Python. Python makes actual MCP requests to this endpoint. The MCP tool then passes JSON to the Java engine and returns its result. All tool calls use caller-supplied records; an external MCP client cannot automatically read your local saved wardrobe.
 
-## Files to start with
+## Files to read
 
 | File | Purpose |
 | --- | --- |
-| `python/wardrobe.py` | Matching rules and purchase comparison. Read this first. |
-| `python/server.py` | Python MCP tools and local frontend serving. |
-| `public/app.js` | User interactions, storage, photo resizing and MCP calls. |
-| `public/index.html` | Page structure. |
-| `public/styles.css` | Burgundy theme and responsive layouts. |
-| `src/engine.js` | Hosted JavaScript version of the rules. |
-| `src/worker-shell.js` | Hosted MCP endpoint and asset serving. |
-| `tests/` | Rule, transport and Python/JavaScript comparison checks. |
-| `docs/CODE_WALKTHROUGH.md` | Plain-language explanation of the code. |
-| `docs/GITHUB_GUIDE.md` | Upload, setup and update instructions. |
+| `java/WardrobeEngine.java` | The main matching rules. |
+| `java/Main.java` | Reads JSON from Python and returns JSON. |
+| `python/bridge.py` | Compiles and invokes Java. |
+| `python/server.py` | Web routes and MCP tools. |
+| `python/store.py` | Validation, backup compatibility and JSON persistence. |
+| `python/limits.py` | Request-size limit. |
+| `templates/` | The HTML pages. |
+| `static/styles.css` | The burgundy theme. |
+| `tests/test_project.py` | Real HTTP form and MCP integration checks. |
+| `docs/CODE_WALKTHROUGH.md` | A plain-language explanation of the flow. |
+| `docs/SETUP_AND_GITHUB.md` | Mac setup, migration and GitHub upload steps. |
 
-## Run the checks
+## Data and backups
 
-With the Python environment activated:
+The local server saves your collection to `data/wardrobe.json`. This folder is ignored by Git. Export a backup through the sidebar before replacing a collection. Backup import supports version 1 JSON files from the earlier browser app, including photos, saved outfits and wear entries.
+
+The current limits are 60 clothes, 300 saved outfits, 5,000 wear entries and up to 24 displayed matches. Photo uploads support JPEG, PNG and WebP up to 12 MB and 25 megapixels. The app resizes them before saving.
+
+This is a local, single-user app bound to `127.0.0.1`. It has stale-form checks, form tokens and upload limits. Multi-user hosting would require authentication, per-user data storage and a platform that can execute Python and Java. The earlier hosted preview remains the earlier implementation; this package is the corrected source.
+
+## Test it
+
+With your Python environment activated:
 
 ```sh
 python -m unittest discover -s tests -p 'test_*.py'
 ```
 
-With Node 18 or newer installed:
+The tests start a temporary local server and use a separate temporary data file. They check Java matching, actual MCP calls, HTML form actions, photos, backups and stale-form handling. They do not replace a visual browser check.
 
-```sh
-node --test tests/*.test.mjs
-```
+## Next improvements
 
-These cover complete outfits, missing pieces, unavailable clothes, conflicting tags, duplicate items, purchase costs, MCP calls and agreement between Python and JavaScript. Automated checks do not replace a visual browser check.
-
-## Storage and current limits
-
-Your collection, photos, saved outfits and wear journal are stored in this browser's IndexedDB. The matching server receives garment metadata; uploaded photo bytes stay in the browser. Collections do not sync between devices. Export a backup before clearing browser data.
-
-The current limits are 60 wardrobe pieces, 300 saved outfits and 5,000 wear entries. Matching displays up to 24 results. Photo inputs support JPEG, PNG and WebP, and are resized before saving.
-
-The local server listens only on `127.0.0.1` for personal development. The hosted version uses its platform's authenticated identity for data-bearing tool calls.
-
-## Build the hosted files
-
-The Python app does not need Node or a Worker build. If you want to inspect the hosted bundle:
-
-```sh
-npm run build
-```
-
-This creates `worker/index.js`, `dist/` and the downloadable source ZIP. A fresh checkout uses `.openai/hosting.example.json` for a local build. Actual deployment requires a registered hosting project and its own configuration.
-
-## What I want to add next
-
-- Fabric and cut tags for more useful comparisons.
-- Feedback on combinations people like or dislike.
-- A database in the Python version for controlled persistence.
-- Better coverage for outer layers and different styling preferences.
+- More useful fabric and cut tags.
+- Feedback on suggested outfits.
+- A database when the project grows beyond local JSON storage.
 
 ## Development
 
-Developed with AI assistance for the initial implementation and documentation. I’m using this project to learn how the Python rules, frontend and MCP server work together, and to build on the first version.
+Developed with AI assistance for the implementation and documentation. I’m using this project to learn the Python/Java integration and extend the first version.

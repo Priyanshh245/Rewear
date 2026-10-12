@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#170b10"><title>REWEAR — Priyansh Panwar</title><link rel="stylesheet" href="/static/styles.css"></head>
+<body>
+<aside class="sidebar">
+  <a class="brand" href="/">re<span>wear</span></a><p class="brand-note">Make more use of what you own.</p>
+  <nav aria-label="Main navigation">
+    {% for key, path, label in [('wardrobe','/','My wardrobe'),('studio','/studio','Outfit studio'),('purchase','/purchase','Before you buy'),('saved','/saved','Saved & worn')] %}
+    <a class="{% if page == key %}active{% endif %}" href="{{path}}">{{label}}</a>
+    {% endfor %}
+  </nav>
+  <div class="side-bottom"><span class="status-dot"></span> Saved on this Mac<a href="/backup">Export wardrobe backup ↗</a><a href="/restore">Restore a backup ↗</a><a href="/reset">Start a fresh wardrobe ↗</a><p>By Priyansh Panwar<br>REWEAR / Version 02</p></div>
+</aside>
+<main>
+  <header class="topbar"><span>YOUR PERSONAL WARDROBE</span><span class="avatar">PP</span></header>
+  {% if message %}<div class="notice" role="status">{{message}}</div>{% endif %}
+  <section class="page">{% block content %}{% endblock %}</section>
+  <footer>REWEAR / More ways to wear what you own.<span>Your tags guide the suggestions. Your taste has the final say.</span></footer>
+</main>
+</body></html>
