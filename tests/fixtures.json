@@ -1,0 +1,8 @@
+[
+ {"id":"t1","name":"White tee","category":"top","color":"white","fit":"regular","pattern":"plain","styles":["casual","smart"],"seasons":["warm","cool","cold"],"available":true},
+ {"id":"t2","name":"Red tee","category":"top","color":"red","fit":"relaxed","pattern":"plain","styles":["casual"],"seasons":["warm","cool","cold"],"available":true},
+ {"id":"b1","name":"Blue jeans","category":"bottom","color":"blue","fit":"relaxed","pattern":"plain","styles":["casual","streetwear"],"seasons":["warm","cool","cold"],"available":true},
+ {"id":"b2","name":"Beige trousers","category":"bottom","color":"beige","fit":"regular","pattern":"plain","styles":["casual","smart"],"seasons":["warm","cool","cold"],"available":true},
+ {"id":"s1","name":"White sneakers","category":"shoes","color":"white","fit":"regular","pattern":"plain","styles":["casual","streetwear"],"seasons":["warm","cool","cold"],"available":true},
+ {"id":"s2","name":"Brown loafers","category":"shoes","color":"brown","fit":"regular","pattern":"plain","styles":["casual","smart"],"seasons":["warm","cool","cold"],"available":true}
+]

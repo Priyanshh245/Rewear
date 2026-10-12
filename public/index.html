@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width,initial-scale=1" name="viewport"/>
+  <meta content="#170b10" name="theme-color"/>
+  <title>
+   REWEAR — make room for better outfits
+  </title>
+  <link href="/styles.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <aside class="sidebar">
+   <a class="brand" href="#wardrobe">re<span>wear</span></a>
+   <p class="brand-note">
+    A little more intentional.
+   </p>
+   <nav aria-label="Main navigation">
+    <button class="active" data-page="wardrobe">
+     <span>
+      ◫
+     </span>
+     My wardrobe
+    </button>
+    <button data-page="studio">
+     <span>
+      ✧
+     </span>
+     Outfit studio
+    </button>
+    <button data-page="compare">
+     <span>
+      ↗
+     </span>
+     Before you buy
+    </button>
+    <button data-page="saved">
+     <span>
+      ♡
+     </span>
+     Saved &amp; worn
+    </button>
+   </nav>
+   <div class="side-bottom">
+    <span class="status-dot">
+    </span>
+    Saved on this browser
+    <button class="text-button" id="backup">
+     Export wardrobe backup ↗
+    </button>
+    <label class="text-button import-label">
+     Restore backup
+     <input accept="application/json,.json" hidden="" id="restore" type="file"/>
+    </label>
+    <a href="/rewear-github.zip">
+     Download project source ↗
+    </a>
+    <button class="text-button" id="how">
+     How matching works
+    </button>
+    <p>
+     By Priyansh Panwar
+     <br/>
+     Version 01 / Python + MCP
+    </p>
+   </div>
+  </aside>
+  <main>
+   <header class="topbar">
+    <span id="breadcrumb">
+     YOUR PERSONAL WARDROBE
+    </span>
+    <span aria-label="Priyansh" class="avatar">
+     PP
+    </span>
+   </header>
+   <section class="page" id="page-wardrobe">
+    <div class="hero">
+     <div>
+      <p class="eyebrow">
+       GOOD STYLE STARTS WITH WHAT YOU OWN
+      </p>
+      <h1>
+       More outfits.
+       <br/>
+       <em>
+        Fewer maybes.
+       </em>
+      </h1>
+      <p class="hero-copy">
+       Get to know your wardrobe. Find a new combination.
+       <br/>
+       Give your next purchase a little thought.
+      </p>
+      <button class="primary" id="hero-add">
+       Add your first piece
+       <span>
+        ＋
+       </span>
+      </button>
+     </div>
+     <div aria-hidden="true" class="hero-art">
+      <span class="art-label">
+       THE EVERYDAY EDIT
+      </span>
+      <div id="hero-items">
+      </div>
+      <span class="art-caption">
+       Your clothes. New possibilities.
+      </span>
+     </div>
+    </div>
+    <div class="notice" hidden="" id="demo-banner">
+     <span>
+      You’re exploring a sample wardrobe. Replace it with your own pieces whenever you’re ready.
+     </span>
+     <button id="clear-demo">
+      Start my wardrobe ↗
+     </button>
+    </div>
+    <div class="metrics">
+     <div>
+      <strong id="metric-pieces">
+       0
+      </strong>
+      <span>
+       pieces in your wardrobe
+      </span>
+     </div>
+     <div>
+      <strong id="metric-looks">
+       0
+      </strong>
+      <span>
+       saved combinations
+      </span>
+     </div>
+     <div>
+      <strong id="metric-wears">
+       0
+      </strong>
+      <span>
+       outfits worn
+      </span>
+     </div>
+    </div>
+    <div class="section-head">
+     <div>
+      <p class="eyebrow">
+       THE COLLECTION
+      </p>
+      <h2>
+       Your everyday pieces
+      </h2>
+     </div>
+     <button class="secondary" id="add-item">
+      ＋ Add a piece
+     </button>
+    </div>
+    <div class="filters">
+     <div class="chips" id="wardrobe-filters">
+     </div>
+     <input aria-label="Search wardrobe" id="search" maxlength="100" placeholder="Search your wardrobe…" type="search"/>
+    </div>
+    <div class="garment-grid" id="wardrobe-grid">
+    </div>
+   </section>
+   <section class="page" hidden="" id="page-studio">
+    <div class="section-head">
+     <div>
+      <p class="eyebrow">
+       MAKE SOMETHING YOU’LL WEAR
+      </p>
+      <h1 class="page-title">
+       Outfit
+       <em>
+        studio.
+       </em>
+      </h1>
+      <p class="muted">
+       Click a piece or drag it into its slot. Add a jacket if you like.
+      </p>
+     </div>
+     <button class="secondary" id="reset-outfit">
+      Clear canvas
+     </button>
+    </div>
+    <div class="studio-panel">
+     <div>
+      <div class="outfit-canvas" id="canvas">
+      </div>
+      <div class="check-note" id="outfit-check">
+       Choose a top, bottoms and shoes to start.
+      </div>
+     </div>
+     <div class="studio-controls">
+      <p class="eyebrow">
+       MAKE IT YOURS
+      </p>
+      <label>
+       Style
+       <select id="studio-style">
+       </select>
+      </label>
+      <label>
+       Season
+       <select id="studio-season">
+       </select>
+      </label>
+      <label>
+       Name this outfit
+       <input id="outfit-name" maxlength="80" placeholder="Sunday coffee run"/>
+      </label>
+      <button class="primary" id="save-outfit">
+       Save combination ♡
+      </button>
+      <button class="secondary" id="suggest">
+       Find compatible outfits ↗
+      </button>
+      <p class="fine">
+       Matching uses your tags. You decide whether the pieces look good together.
+      </p>
+     </div>
+    </div>
+    <div class="section-head">
+     <h2>
+      Pick your pieces
+     </h2>
+     <span class="muted">
+      Unavailable pieces stay in your wardrobe.
+     </span>
+    </div>
+    <div class="garment-grid compact" id="studio-grid">
+    </div>
+    <div id="suggestions">
+    </div>
+   </section>
+   <section class="page" hidden="" id="page-compare">
+    <p class="eyebrow">
+     A LITTLE PAUSE BEFORE CHECKOUT
+    </p>
+    <h1 class="page-title">
+     Worth a place
+     <br/>
+     in your
+     <em>
+      wardrobe?
+     </em>
+    </h1>
+    <p class="muted">
+     Add a potential purchase. See what it could work with and what you already own.
+    </p>
+    <div class="purchase-layout">
+     <form class="purchase-form" id="purchase-form">
+      <div class="form-header">
+       <h2>
+        The potential purchase
+       </h2>
+       <span>
+        01
+       </span>
+      </div>
+      <div id="purchase-fields">
+      </div>
+      <div class="form-row">
+       <label>
+        Price, CAD (optional)
+        <input max="100000" min="0" name="price" placeholder="85.00" step="0.01" type="number"/>
+       </label>
+       <label>
+        Estimated wears (optional)
+        <input max="10000" min="1" name="expected_wears" placeholder="25" step="1" type="number"/>
+       </label>
+      </div>
+      <div class="form-row">
+       <label>
+        Match for
+        <select name="match_style">
+        </select>
+       </label>
+       <label>
+        Season
+        <select name="match_season">
+        </select>
+       </label>
+      </div>
+      <button class="primary" type="submit">
+       Test it with my wardrobe ↗
+      </button>
+      <p class="fine">
+       Photos stay in this browser. Matching sends garment tags to the server.
+      </p>
+     </form>
+     <div class="purchase-results" id="purchase-results">
+      <div class="result-placeholder">
+       <span>
+        ↗
+       </span>
+       <h2>
+        Let your wardrobe
+        <br/>
+        have a say.
+       </h2>
+       <p>
+        Choose the item’s tags and test it.
+        <br/>
+        Your existing clothes will do the rest.
+       </p>
+      </div>
+     </div>
+    </div>
+   </section>
+   <section class="page" hidden="" id="page-saved">
+    <p class="eyebrow">
+     THE OUTFITS THAT MADE THE CUT
+    </p>
+    <h1 class="page-title">
+     Saved
+     <em>
+      &amp; worn.
+     </em>
+    </h1>
+    <p class="muted">
+     Keep the combinations you like. Log a wear when you actually put one on.
+    </p>
+    <div class="saved-grid" id="saved-grid">
+    </div>
+    <div class="section-head">
+     <h2>
+      Your wear journal
+     </h2>
+     <button class="secondary" hidden="" id="undo-wear">
+      Undo last wear
+     </button>
+    </div>
+    <div id="wear-journal">
+    </div>
+   </section>
+   <footer>
+    REWEAR / A wardrobe with more possibilities.
+    <span>
+     Tag-based matching · Your taste has the final say.
+    </span>
+   </footer>
+  </main>
+  <dialog id="item-dialog">
+   <form id="item-form">
+    <div class="dialog-head">
+     <div>
+      <p class="eyebrow">
+       YOUR COLLECTION
+      </p>
+      <h2 id="item-title">
+       Add a piece
+      </h2>
+     </div>
+     <button aria-label="Close" class="close" data-close="item-dialog" type="button">
+      ×
+     </button>
+    </div>
+    <div id="item-fields">
+    </div>
+    <button class="primary" type="submit">
+     Save piece ↗
+    </button>
+   </form>
+  </dialog>
+  <dialog id="info-dialog">
+   <div class="dialog-head">
+    <h2>
+     Simple rules, visible reasons.
+    </h2>
+    <button aria-label="Close" class="close" data-close="info-dialog">
+     ×
+    </button>
+   </div>
+   <p>
+    A complete outfit contains one top, one bottom and shoes. A jacket is optional.
+   </p>
+   <ul>
+    <li>
+     Every piece must be available and share a style and season tag.
+    </li>
+    <li>
+     This first version allows one accent colour and one patterned piece. Blue and navy count as neutrals.
+    </li>
+    <li>
+     “Similar” means the same category, colour, fit, pattern, style and season tags. Photos are for display; they aren’t analysed.
+    </li>
+    <li>
+     Cost per wear is the price divided by the number of wears you estimate.
+    </li>
+   </ul>
+   <p>
+    These rules are a starting point for exploration. They don’t judge beauty or guarantee fit, warmth or suitability.
+   </p>
+   <p class="fine">
+    Wardrobe, photos, saved outfits and wear logs live in this browser’s IndexedDB. Export a backup before clearing browser data or switching devices. The MCP server takes supplied garment metadata; it cannot read your browser wardrobe automatically.
+   </p>
+  </dialog>
+  <dialog id="confirm-dialog">
+   <h2 id="confirm-title">
+    Are you sure?
+   </h2>
+   <p id="confirm-copy">
+   </p>
+   <div class="form-row">
+    <button class="secondary" id="confirm-cancel">
+     Cancel
+    </button>
+    <button class="primary" id="confirm-ok">
+     Continue
+    </button>
+   </div>
+  </dialog>
+  <div aria-live="polite" id="toast" role="status">
+  </div>
+  <script defer="" src="/app.js">
+  </script>
+ </body>
+</html>
