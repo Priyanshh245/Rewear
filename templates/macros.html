@@ -1,0 +1,35 @@
+{% macro token(csrf, state) %}<input type="hidden" name="csrf" value="{{csrf}}"><input type="hidden" name="revision" value="{{state.revision}}">{% endmacro %}
+
+{% macro garment(item, preview=false) %}
+{% if item.get('image') %}
+  {% if preview %}<img src="{{item.image}}" alt="{{item.name}}">{% else %}<img src="/photo?id={{item.id|urlencode}}" alt="{{item.name}}" loading="lazy">{% endif %}
+{% else %}
+{% set fills = {'black':'#30312f','white':'#eceee6','grey':'#9d9f98','beige':'#ccba98','brown':'#89644c','navy':'#374553','blue':'#7b98aa','green':'#76896d','red':'#b95c4b','pink':'#d29a9e','purple':'#9a82ad','orange':'#cd8b52'} %}
+{% set paths = {'top':'M47 24 L66 18 Q80 36 94 18 L113 24 L139 49 L120 72 L108 62 L108 140 L52 140 L52 62 L40 72 L21 49 Z','bottom':'M49 20 L111 20 L118 146 L90 146 L80 67 L70 146 L42 146 Z','shoes':'M20 89 L44 61 L59 67 L73 91 L123 111 Q141 115 138 134 L20 134 Q12 110 20 89 Z','outer':'M47 24 L66 18 L80 36 L94 18 L113 24 L132 51 L148 120 L126 128 L108 66 L108 143 L52 143 L52 66 L34 128 L12 120 L28 51 Z'} %}
+<svg viewBox="0 0 160 165" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="{{paths[item.category]}}" fill="{{fills[item.color]}}" stroke="#283c3455" stroke-width="1.5" stroke-linejoin="round"/>{% if item.category == 'outer' %}<path d="M80 36V143 M60 92H72 M88 92H100" fill="none" stroke="#283c3455"/>{% elif item.category == 'bottom' %}<path d="M49 33H111 M80 22V64" fill="none" stroke="#283c3455"/>{% endif %}{% if item.pattern == 'stripe' %}<path d="M53 85H107 M53 97H107 M53 109H107" stroke="#283c3455"/>{% elif item.pattern == 'print' %}<circle cx="79" cy="85" r="12" fill="none" stroke="#283c3455"/>{% endif %}</svg>
+{% endif %}
+{% endmacro %}
+
+{% macro fields(item, mode, categories, colors, styles, seasons) %}
+<input type="hidden" name="mode" value="{{mode}}">
+{% if mode == 'item' and item.get('id') %}<input type="hidden" name="id" value="{{item.id}}">{% endif %}
+<div class="item-fields">
+  <label>Piece name<input name="name" required maxlength="100" placeholder="Black relaxed jeans" value="{{item.get('name','')}}"></label>
+  <div class="form-row"><label>Category<select name="category">{% for value in categories %}<option value="{{value}}" {% if value==item.get('category','top') %}selected{% endif %}>{{value|capitalize}}</option>{% endfor %}</select></label><label>Colour<select name="color">{% for value in colors %}<option value="{{value}}" {% if value==item.get('color','black') %}selected{% endif %}>{{value|capitalize}}</option>{% endfor %}</select></label></div>
+  <div class="form-row"><label>Fit<select name="fit">{% for value in ['slim','regular','relaxed'] %}<option {% if value==item.get('fit','regular') %}selected{% endif %}>{{value}}</option>{% endfor %}</select></label><label>Pattern<select name="pattern">{% for value in ['plain','stripe','print'] %}<option {% if value==item.get('pattern','plain') %}selected{% endif %}>{{value}}</option>{% endfor %}</select></label></div>
+  {% for key,values,selected in [('styles',styles,item.get('styles',['casual'])),('seasons',seasons,item.get('seasons',seasons))] %}<fieldset class="tag-fields"><legend>{{key|capitalize}} · choose at least one</legend><div class="tag-options">{% for value in values %}<label><input type="checkbox" name="{{key}}" value="{{value}}" {% if value in selected %}checked{% endif %}>{{value}}</label>{% endfor %}</div></fieldset>{% endfor %}
+  <label>Photo (optional)<input type="file" name="photo" accept="image/jpeg,image/png,image/webp"></label><p class="fine">JPEG, PNG or WebP · up to 12 MB. Photos are for display.</p>
+  {% if item.get('image') %}<label class="checkbox-line"><input type="checkbox" name="remove_photo">Remove the saved photo</label>{% endif %}
+  {% if mode=='item' %}<label class="checkbox-line"><input type="checkbox" name="available" {% if item.get('available',true) %}checked{% endif %}>Available to wear</label>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro filters(styles, seasons, selected_style='any', selected_season='any') %}
+<div class="form-row"><label>Style<select name="style"><option value="any">Any shared style</option>{% for value in styles %}<option {% if value==selected_style %}selected{% endif %}>{{value}}</option>{% endfor %}</select></label><label>Season<select name="season"><option value="any">Any shared season</option>{% for value in seasons %}<option {% if value==selected_season %}selected{% endif %}>{{value}}</option>{% endfor %}</select></label></div>
+{% endmacro %}
+
+{% macro combination(look, lookup, index=0, candidate_id=none) %}
+<div class="look-pieces">{% for id in look.item_ids %}<div class="mini-piece">{{garment(lookup[id], id==candidate_id)}}</div>{% endfor %}</div>
+<h3>{{look.get('name','Combination ' ~ (index+1))}}</h3><p>{% for id in look.item_ids %}{{lookup[id].name}}{% if not loop.last %} + {% endif %}{% endfor %}</p>
+{% if look.get('reasons') %}<p>{{look.reasons[0]}}</p>{% endif %}
+{% endmacro %}
